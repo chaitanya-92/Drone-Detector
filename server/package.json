@@ -1,0 +1,16 @@
+{
+  "name": "drone-fleet-server",
+  "version": "1.0.0",
+  "description": "Drone Fleet Tracking - Node.js backend with Express REST API, WebSocket live updates, and auto-simulator",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "ws": "^8.17.0"
+  }
+}
