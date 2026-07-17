@@ -2,7 +2,11 @@
 
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 
-const WS_URL = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`;
+// In dev, connect straight to the Node server (no Vite proxy in the middle —
+// avoids noisy EPIPE proxy warnings on page refresh). In production, same host.
+const WS_URL = import.meta.env.DEV
+  ? `ws://${location.hostname}:4000/ws`
+  : `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`;
 const LOG_MAX = 80;
 
 const initialState = {
@@ -72,6 +76,21 @@ function reducer(state, action) {
         drones[d.id] = d;
       });
       return { ...state, drones, stats: action.payload.stats, log };
+    }
+    case 'fleet:imported': {
+      const drones = { ...state.drones };
+      action.payload.drones.forEach((d) => (drones[d.id] = d));
+      const company = state.companies.find((c) => c.id === action.payload.companyId);
+      return {
+        ...state,
+        drones,
+        stats: action.payload.stats,
+        log: addLog(
+          state,
+          `Fleet imported: ${action.payload.drones.length} drones → ${company?.name || 'Unknown'}`,
+          'ok'
+        )
+      };
     }
     case 'drone:added': {
       const d = action.payload.drone;

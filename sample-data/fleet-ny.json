@@ -1,0 +1,7 @@
+[
+  { "name": "Osprey-1", "model": "Skydio X10", "lat": 40.7190, "lng": -74.0150, "battery": 82, "status": "active" },
+  { "name": "Osprey-2", "model": "DJI Matrice 350", "lat": 40.7066, "lng": -73.9970, "battery": 68, "status": "active" },
+  { "name": "Osprey-3", "model": "Zipline P2", "lat": 40.7222, "lng": -73.9998, "battery": 47, "status": "active" },
+  { "name": "Osprey-4", "model": "Wing Hummingbird", "lat": 40.7101, "lng": -74.0201, "battery": 25, "status": "idle" },
+  { "name": "Osprey-5", "model": "Parrot Anafi AI", "lat": 40.7128, "lng": -74.0060, "battery": 12, "status": "returning" }
+]

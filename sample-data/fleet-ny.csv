@@ -1,0 +1,7 @@
+name,model,lat,lng,battery,status
+Hawk-1,DJI Matrice 350,40.7215,-74.0021,86,active
+Hawk-2,Skydio X10,40.7044,-74.0180,59,active
+Hawk-3,Zipline P2,40.7189,-73.9902,94,active
+Hawk-4,Wing Hummingbird,40.7080,-74.0122,41,idle
+Hawk-5,Parrot Anafi AI,40.7161,-74.0250,19,returning
+Hawk-6,Autel Dragonfish,40.7128,-74.0060,100,charging

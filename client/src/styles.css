@@ -227,6 +227,13 @@ body {
   color: var(--cyan);
 }
 
+.stat-flash { animation: flash 0.5s ease-out; }
+
+@keyframes flash {
+  0% { text-shadow: 0 0 14px currentColor; transform: scale(1.15); }
+  100% { text-shadow: none; transform: scale(1); }
+}
+
 .tile-green .stat-tile-value { color: var(--green); }
 .tile-red .stat-tile-value { color: var(--red); }
 .tile-amber .stat-tile-value { color: var(--amber); }
@@ -294,6 +301,12 @@ body {
   font-size: 11px;
   line-height: 1.5;
   letter-spacing: 0.02em;
+  animation: slide-in 0.25s ease-out;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .log-time { color: var(--text-dim); margin-right: 6px; }
@@ -359,6 +372,19 @@ body {
 }
 
 .blip { cursor: pointer; }
+
+.blip-ping {
+  fill: none;
+  stroke-width: 1.5;
+  animation: ping 2.6s ease-out infinite;
+}
+
+.blip-ping-fast { animation-duration: 1.1s; }
+
+@keyframes ping {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(5); opacity: 0; }
+}
 
 .blip-core {
   filter: drop-shadow(0 0 5px currentColor);
@@ -482,6 +508,68 @@ body {
   padding: 12px 14px;
   border-top: 1px solid var(--border);
   background: var(--bg-inset);
+}
+
+.form-step {
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+
+.mode-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-mode { flex: 1; padding: 7px 8px; color: var(--text-dim); }
+
+.btn-mode-on {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: var(--bg-panel);
+}
+
+.btn-primary {
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.btn-primary:hover {
+  background: rgba(45, 212, 130, 0.1);
+  border-color: var(--green);
+}
+
+.gen-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+}
+
+.gen-row input {
+  width: 70px;
+  background: var(--bg-panel);
+  color: var(--text);
+  border: 1px solid var(--border-bright);
+  padding: 7px 8px;
+  font-family: inherit;
+}
+
+.form textarea {
+  background: var(--bg-panel);
+  color: var(--text);
+  border: 1px solid var(--border-bright);
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 11px;
+  resize: vertical;
+}
+
+.form textarea:focus {
+  outline: none;
+  border-color: var(--cyan);
 }
 
 .form input,

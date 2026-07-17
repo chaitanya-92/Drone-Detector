@@ -24,5 +24,7 @@ export const api = {
   getCompanyDrones: (id) => request(`/companies/${id}/drones`),
   addDrone: (companyId, data) =>
     request(`/companies/${companyId}/drones`, { method: 'POST', body: JSON.stringify(data) }),
+  importFleet: (companyId, data) =>
+    request(`/companies/${companyId}/fleet`, { method: 'POST', body: JSON.stringify(data) }),
   deleteDrone: (id) => request(`/drones/${id}`, { method: 'DELETE' })
 };

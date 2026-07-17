@@ -2,7 +2,13 @@ import { useState } from 'react';
 import CompanyCard from './CompanyCard.jsx';
 import AddCompanyForm from './AddCompanyForm.jsx';
 
-export default function CompanyList({ companies, droneCounts = {}, selectedCompanyId, onSelect }) {
+export default function CompanyList({
+  companies,
+  droneCounts = {},
+  selectedCompanyId,
+  onSelect,
+  onCompanyCreated
+}) {
   const [showForm, setShowForm] = useState(false);
 
   return (
@@ -20,7 +26,9 @@ export default function CompanyList({ companies, droneCounts = {}, selectedCompa
           />
         ))}
       </div>
-      {showForm && <AddCompanyForm onDone={() => setShowForm(false)} />}
+      {showForm && (
+        <AddCompanyForm onDone={() => setShowForm(false)} onCompanyCreated={onCompanyCreated} />
+      )}
       <button className="btn btn-wide" onClick={() => setShowForm((v) => !v)}>
         {showForm ? '✕ CANCEL' : '+ ADD COMPANY'}
       </button>

@@ -6,11 +6,8 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:4000',
-      '/ws': {
-        target: 'ws://localhost:4000',
-        ws: true
-      }
+      '/api': 'http://localhost:4000'
+      // WebSocket connects directly to :4000 in dev (see src/hooks/useFleet.js)
     }
   }
 });

@@ -77,6 +77,51 @@ export function buildRouter(broadcast) {
     res.status(201).json(drone);
   });
 
+  // 8. POST /api/companies/:id/fleet — bulk import a company's fleet dataset.
+  // Body: { drones: [{name?, model?, lat?, lng?, battery?, status?}, ...] }
+  //   or: { generate: <count 1-50> } to auto-spawn drones near the hub.
+  router.post('/companies/:id/fleet', (req, res) => {
+    if (!store.companies.has(req.params.id)) {
+      return res.status(404).json({ error: 'Company not found' });
+    }
+    const { drones, generate } = req.body || {};
+    let specs = [];
+
+    if (Array.isArray(drones)) {
+      if (drones.length === 0 || drones.length > 100) {
+        return res.status(400).json({ error: 'Provide 1-100 drones' });
+      }
+      specs = drones;
+    } else if (generate) {
+      const count = Math.floor(Number(generate));
+      if (!Number.isFinite(count) || count < 1 || count > 50) {
+        return res.status(400).json({ error: 'generate must be 1-50' });
+      }
+      specs = Array.from({ length: count }, () => ({}));
+    } else {
+      return res.status(400).json({ error: 'Provide "drones" array or "generate" count' });
+    }
+
+    const created = specs.map((spec) =>
+      createDrone({
+        companyId: req.params.id,
+        name: typeof spec.name === 'string' ? spec.name.trim() || undefined : undefined,
+        model: typeof spec.model === 'string' ? spec.model.trim() || undefined : undefined,
+        lat: Number.isFinite(Number(spec.lat)) ? Number(spec.lat) : undefined,
+        lng: Number.isFinite(Number(spec.lng)) ? Number(spec.lng) : undefined,
+        battery: spec.battery,
+        status: spec.status,
+        center: getCenter()
+      })
+    );
+
+    broadcast({
+      type: 'fleet:imported',
+      payload: { companyId: req.params.id, drones: created, stats: getStats() }
+    });
+    res.status(201).json({ ok: true, imported: created.length, drones: created });
+  });
+
   // Extra: GET /api/drones — full fleet
   router.get('/drones', (req, res) => {
     res.json(getDrones());

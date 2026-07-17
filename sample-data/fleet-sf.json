@@ -1,0 +1,8 @@
+[
+  { "name": "Raven-1", "model": "DJI Matrice 350", "lat": 37.7838, "lng": -122.4290, "battery": 91, "status": "active" },
+  { "name": "Raven-2", "model": "Skydio X10", "lat": 37.7690, "lng": -122.4102, "battery": 77, "status": "active" },
+  { "name": "Raven-3", "model": "Wing Hummingbird", "lat": 37.7905, "lng": -122.4001, "battery": 55, "status": "active" },
+  { "name": "Raven-4", "model": "Zipline P2", "lat": 37.7622, "lng": -122.4355, "battery": 33, "status": "idle" },
+  { "name": "Raven-5", "model": "Parrot Anafi AI", "lat": 37.7788, "lng": -122.4433, "battery": 15, "status": "returning" },
+  { "name": "Raven-6", "model": "Autel Dragonfish", "lat": 37.7749, "lng": -122.4194, "battery": 98, "status": "charging" }
+]

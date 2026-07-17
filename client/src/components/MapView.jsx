@@ -63,7 +63,7 @@ export default function MapView({ drones, companies, center, span, scanning, sel
         {/* Hub */}
         <circle cx={C} cy={C} r={3} className="hub-dot" />
 
-        {/* Drones */}
+        {/* Drones — CSS transform so movement glides between 1s ticks */}
         {drones.map((d) => {
           const { x, y } = project(d);
           const color = companies[d.companyId]?.color || '#7de3a0';
@@ -71,15 +71,21 @@ export default function MapView({ drones, companies, center, span, scanning, sel
           return (
             <g
               key={d.id}
-              transform={`translate(${x}, ${y})`}
+              style={{ transform: `translate(${x}px, ${y}px)`, transition: 'transform 1s linear' }}
               className={`blip ${selected ? 'blip-selected' : ''}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onSelectDrone(d.id);
               }}
             >
+              {d.status === 'active' && (
+                <circle r={5} className="blip-ping" stroke={color} />
+              )}
+              {d.status === 'returning' && (
+                <circle r={5} className="blip-ping blip-ping-fast" stroke="#f04e4e" />
+              )}
               {selected && <circle r={14} className="blip-halo" />}
-              <circle r={9} fill={color} opacity="0.25" />
+              <circle r={9} fill={color} opacity="0.22" />
               <circle r={4.5} fill={color} className="blip-core" />
               <text y={22} textAnchor="middle" className="blip-label">
                 {d.name}

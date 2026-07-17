@@ -21,11 +21,23 @@ const wss = new WebSocketServer({ server, path: '/ws' });
 function broadcast(message) {
   const data = JSON.stringify(message);
   wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) client.send(data);
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(data, (err) => {
+        if (err) client.terminate();
+      });
+    }
   });
 }
 
+wss.on('error', (err) => console.error('WSS error:', err.message));
+
 wss.on('connection', (ws) => {
+  // Never let a dropped socket crash the process
+  ws.on('error', (err) => {
+    console.error('WS client error:', err.message);
+    ws.terminate();
+  });
+
   // Server -> Client: full state on connect
   ws.send(JSON.stringify({ type: 'init', payload: snapshot() }));
 

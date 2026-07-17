@@ -13,7 +13,9 @@ export default function StatsPanel({ stats }) {
         {tiles.map((t) => (
           <div key={t.label} className={`stat-tile ${t.cls}`}>
             <span className="stat-tile-label">{t.label}</span>
-            <span className="stat-tile-value">{t.value}</span>
+            <span key={t.value} className="stat-tile-value stat-flash">
+              {t.value}
+            </span>
           </div>
         ))}
       </div>

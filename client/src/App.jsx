@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFleet } from './hooks/useFleet.js';
 import Header from './components/Header.jsx';
 import StatsPanel from './components/StatsPanel.jsx';
@@ -13,6 +13,20 @@ export default function App() {
   const fleet = useFleet();
   const [selectedCompanyId, setSelectedCompanyId] = useState(null);
   const [selectedDroneId, setSelectedDroneId] = useState(null);
+
+  // Reset selections when the dataset changes or the selected company disappears,
+  // otherwise a stale filter leaves the radar and tracks empty.
+  useEffect(() => {
+    setSelectedCompanyId(null);
+    setSelectedDroneId(null);
+  }, [fleet.datasetId]);
+
+  useEffect(() => {
+    if (selectedCompanyId && !fleet.companies.some((c) => c.id === selectedCompanyId)) {
+      setSelectedCompanyId(null);
+      setSelectedDroneId(null);
+    }
+  }, [fleet.companies, selectedCompanyId]);
 
   const visibleDrones = useMemo(
     () =>
@@ -68,6 +82,7 @@ export default function App() {
             droneCounts={droneCounts}
             selectedCompanyId={selectedCompanyId}
             onSelect={selectCompany}
+            onCompanyCreated={(id) => setSelectedCompanyId(id)}
           />
           <StatsPanel stats={fleet.stats} />
           <DroneList

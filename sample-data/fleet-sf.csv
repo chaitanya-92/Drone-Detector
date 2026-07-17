@@ -1,0 +1,9 @@
+name,model,lat,lng,battery,status
+Falcon-1,Skydio X10,37.7812,-122.4090,88,active
+Falcon-2,Zipline P2,37.7685,-122.4310,64,active
+Falcon-3,DJI Matrice 350,37.7920,-122.4155,92,active
+Falcon-4,Wing Hummingbird,37.7601,-122.4048,45,active
+Falcon-5,Parrot Anafi AI,37.7855,-122.4402,71,idle
+Falcon-6,Autel Dragonfish,37.7702,-122.3980,18,returning
+Falcon-7,Skydio X10,37.7749,-122.4194,100,charging
+Falcon-8,Zipline P2,37.7660,-122.4250,83,active

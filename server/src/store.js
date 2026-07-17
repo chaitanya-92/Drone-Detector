@@ -33,7 +33,7 @@ export function createCompany({ name, industry = 'General', color = '#4fc3f7' })
   return company;
 }
 
-export function createDrone({ companyId, name, model, lat, lng, center }) {
+export function createDrone({ companyId, name, model, lat, lng, center, battery, status }) {
   const id = `d${nextDroneId++}`;
   const base = center || { lat: lat ?? 0, lng: lng ?? 0 };
   const drone = {
@@ -41,8 +41,8 @@ export function createDrone({ companyId, name, model, lat, lng, center }) {
     companyId,
     name: name || `Drone-${String(nextDroneId - 1).padStart(3, '0')}`,
     model: model || DRONE_MODELS[Math.floor(Math.random() * DRONE_MODELS.length)],
-    status: 'active',
-    battery: 60 + Math.round(Math.random() * 40),
+    status: DRONE_STATUSES.includes(status) ? status : 'active',
+    battery: clampBattery(battery) ?? 60 + Math.round(Math.random() * 40),
     lat: lat ?? base.lat + (Math.random() - 0.5) * 0.1,
     lng: lng ?? base.lng + (Math.random() - 0.5) * 0.1,
     altitude: 40 + Math.round(Math.random() * 120), // meters
@@ -52,6 +52,12 @@ export function createDrone({ companyId, name, model, lat, lng, center }) {
   };
   store.drones.set(id, drone);
   return drone;
+}
+
+function clampBattery(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return null;
+  return Math.max(0, Math.min(100, Math.round(n)));
 }
 
 export function getCompanies() {

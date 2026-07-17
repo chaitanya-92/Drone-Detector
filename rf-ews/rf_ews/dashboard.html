@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RF-EWS · Alerts</title>
+<style>
+:root{--bg:#030a14;--panel:#06101f;--inset:#081524;--border:#12283f;--border2:#1c3d5c;
+--text:#b8d4e8;--dim:#4a6f8c;--cyan:#35c3e8;--green:#2dd482;--amber:#f5a623;--red:#f04e4e}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',Menlo,monospace;font-size:12px;padding:14px}
+h1{color:var(--cyan);font-size:14px;letter-spacing:.35em;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.panel{background:var(--panel);border:1px solid var(--border)}
+.pt{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--cyan);font-size:11px;letter-spacing:.25em}
+.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+.tile{background:var(--panel);border:1px solid var(--border2);padding:12px;text-align:center}
+.tile b{display:block;font-size:24px;margin-top:4px}
+.tile span{color:var(--dim);font-size:10px;letter-spacing:.2em}
+.t-uas b{color:var(--red)}.t-non b{color:var(--dim)}.t-unk b{color:var(--amber)}
+.t-tot b{color:var(--cyan)}.t-lat b{color:var(--green)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{color:var(--dim);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);letter-spacing:.15em;font-size:10px;position:sticky;top:0;background:var(--panel)}
+td{padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+tr{cursor:pointer}tr:hover td{background:var(--inset)}
+.v{font-weight:700;padding:1px 7px;border:1px solid;font-size:10px}
+.v-uas{color:var(--red);border-color:var(--red)}
+.v-non{color:var(--dim);border-color:var(--dim)}
+.v-unk{color:var(--amber);border-color:var(--amber)}
+.scroll{max-height:420px;overflow-y:auto}
+.evidence{padding:14px}
+.evidence img{width:100%;image-rendering:pixelated;border:1px solid var(--border2)}
+.kv{padding:0 14px 14px;font-size:11px;line-height:1.9}
+.kv b{color:var(--cyan)}
+.slider{display:flex;align-items:center;gap:12px;padding:12px 14px;color:var(--dim);font-size:10px;letter-spacing:.15em}
+input[type=range]{flex:1;accent-color:var(--cyan)}
+.conf-bar{background:var(--inset);height:8px;width:70px;display:inline-block;vertical-align:middle}
+.conf-fill{height:100%;background:var(--cyan)}
+.empty{color:var(--dim);text-align:center;padding:20px;letter-spacing:.15em}
+</style>
+</head>
+<body>
+<h1>RF-EWS · ANTI-UAS EARLY WARNING · ALERT REVIEW</h1>
+<div class="tiles" id="tiles"></div>
+<div class="grid">
+  <div class="panel">
+    <div class="pt">■ ALERTS TIMELINE</div>
+    <div class="slider">THRESHOLD <input type="range" id="thr" min="0" max="100" value="0">
+      <span id="thrv">0.00</span></div>
+    <div class="scroll"><table>
+      <thead><tr><th>ID</th><th>T ONSET</th><th>VERDICT</th><th>CONF</th><th>FREQ</th><th>BW</th><th>LAT</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </div>
+  <div class="panel">
+    <div class="pt">▶ EVIDENCE SNAPSHOT</div>
+    <div id="detail"><p class="empty">SELECT AN ALERT</p></div>
+  </div>
+</div>
+<script>
+let alerts=[],summary=null;
+async function load(){
+  const txt=await fetch('alerts.jsonl').then(r=>r.text());
+  alerts=txt.split('\n').filter(l=>l.trim()).map(JSON.parse);
+  try{summary=await fetch('summary.json').then(r=>r.json())}catch(e){}
+  render();
+}
+function fmt(hz){return (hz/1e6).toFixed(3)+' MHz'}
+function render(){
+  const thr=+document.getElementById('thr').value/100;
+  document.getElementById('thrv').textContent=thr.toFixed(2);
+  const vis=alerts.filter(a=>a.confidence>=thr||a.verdict!=='UAS-like');
+  const c={ 'UAS-like':0,'Non-UAS':0,'Unknown':0 };
+  vis.forEach(a=>c[a.verdict]=(c[a.verdict]||0)+1);
+  const lat=summary?summary.latency_p95_s:null;
+  document.getElementById('tiles').innerHTML=
+    `<div class="tile t-tot"><span>TOTAL</span><b>${vis.length}</b></div>`+
+    `<div class="tile t-uas"><span>UAS-LIKE</span><b>${c['UAS-like']}</b></div>`+
+    `<div class="tile t-non"><span>NON-UAS</span><b>${c['Non-UAS']}</b></div>`+
+    `<div class="tile t-unk"><span>UNKNOWN</span><b>${c['Unknown']}</b></div>`+
+    `<div class="tile t-lat"><span>LAT P95</span><b>${lat!=null?lat+'s':'—'}</b></div>`;
+  document.getElementById('rows').innerHTML=vis.map((a,i)=>{
+    const cls=a.verdict==='UAS-like'?'v-uas':a.verdict==='Unknown'?'v-unk':'v-non';
+    return `<tr onclick="show(${i})"><td style="color:var(--cyan)">${a.alert_id}</td>`+
+    `<td>${a.t_onset.toFixed(2)}s</td><td><span class="v ${cls}">${a.verdict}</span></td>`+
+    `<td><span class="conf-bar"><span class="conf-fill" style="width:${a.confidence*100}%"></span></span> ${a.confidence.toFixed(2)}</td>`+
+    `<td>${fmt(a.f_center_hz)}</td><td>${(a.bandwidth_hz/1e3).toFixed(0)}k</td><td>${a.latency_s.toFixed(2)}s</td></tr>`;
+  }).join('');
+  window._vis=vis;
+}
+function show(i){
+  const a=window._vis[i];
+  const f=a.features||{};
+  const sig=a.signature?`<b>SIGNATURE</b> ${a.signature.id} (sim ${a.signature.similarity})<br>`:'';
+  document.getElementById('detail').innerHTML=
+    (a.evidence?`<div class="evidence"><img src="${a.evidence}"></div>`:'<p class="empty">NO SNAPSHOT</p>')+
+    `<div class="kv"><b>${a.alert_id}</b> · ${a.verdict} · conf ${a.confidence}<br>`+
+    `<b>TIME</b> ${a.t_onset}s → ${a.t_emitted}s (lat ${a.latency_s}s)<br>`+
+    `<b>FREQ</b> ${fmt(a.f_center_hz)} · BW ${(a.bandwidth_hz/1e3).toFixed(1)} kHz<br>`+sig+
+    `<b>BURSTS</b> ${a.n_bursts} · rate ${(f.burst_rate_hz||0).toFixed(1)}/s · `+
+    `period CV ${(f.interval_cv||0).toFixed(2)} · hop spread ${(f.freq_spread_khz||0).toFixed(0)} kHz</div>`;
+}
+document.getElementById('thr').oninput=render;
+load();
+</script>
+</body>
+</html>
